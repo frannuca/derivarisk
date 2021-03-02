@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.808.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "derivarisk", "derivarisk\derivarisk.fsproj", "{B2EC5122-29FD-42F9-B2C8-C0ED93315114}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "derivariskTests", "derivariskTests\derivariskTests.fsproj", "{0F7A22DB-E31C-451B-B075-61849AC92578}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B2EC5122-29FD-42F9-B2C8-C0ED93315114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2EC5122-29FD-42F9-B2C8-C0ED93315114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2EC5122-29FD-42F9-B2C8-C0ED93315114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2EC5122-29FD-42F9-B2C8-C0ED93315114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F7A22DB-E31C-451B-B075-61849AC92578}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F7A22DB-E31C-451B-B075-61849AC92578}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F7A22DB-E31C-451B-B075-61849AC92578}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F7A22DB-E31C-451B-B075-61849AC92578}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4FC4681A-803C-4E80-B0C4-CBBCA0055459}
+	EndGlobalSection
+EndGlobal

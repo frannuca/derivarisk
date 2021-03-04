@@ -4,6 +4,7 @@ open System
 open MathNet.Numerics
 open System.Numerics
 open MathNet.Numerics.Random
+open Deedle
 
 //https://quant.stackexchange.com/questions/18684/heston-model-option-price-formula
 
@@ -28,32 +29,41 @@ open MathNet.Numerics.Random
 
     type Kparams={K0:float;K1:float;K2:float;K3:float;K4:float;A:float}
 
-    type AssetName = AssetName of string
-    let norm = Distributions.Normal()
-    let unif = Distributions.ContinuousUniform(0.0,1.0)
-    let computeMCPaths(assets_rho:Matrix<float>,npaths:int,ntimesteps:int,hestonparams:Map<AssetName,HestonParams>)=
+    let computeK(v:HestonParams)=
+        let K0 = -v.kappa*v.rho*v.theta/v.sigma*v.dt
+        let K1 = (v.kappa*v.rho/v.sigma-0.5)*v.gamma_1*v.dt-v.rho/v.sigma
+        let K2 = (v.kappa*v.rho/v.sigma-0.5)*v.gamma_2*v.dt+v.rho/v.sigma
+        let K3 = (1.0-v.rho**2.0)*v.gamma_1*v.dt
+        let K4 = (1.0-v.rho**2.0)*v.gamma_2*v.dt
+        let A = K2+0.5*K4
+        {K0=K0;K1=K1;K2=K2;K3=K3;K4=K4;A=A}
         
-        
-        let cube = MCSimCube.generate_cube assets_rho 42 npaths ntimesteps (hestonparams.Count)
-        let cube_vols = MCSimCube.generate_cube (Matrix<float>.Build.Diagonal(hestonparams.Count,hestonparams.Count,1.0)) 23 npaths ntimesteps (hestonparams.Count)
+    type AssetName = AssetName of string    
+    let seedS = 42
+    let seedV = 1
+
+
+    let computeMCPaths(assets_rho_frame:Frame<AssetName,AssetName>,
+                       vol_rho_frame:Frame<AssetName,AssetName>, 
+                       npaths:int,
+                       ntimesteps:int,
+                       hestonparams:Map<AssetName,HestonParams>)=
 
         let asset_names = hestonparams |> Seq.map(fun kv -> kv.Key) |> Array.ofSeq
-        let Ks = hestonparams
-                            |> Map.map(fun key v ->                                
-                                let K0 = -v.kappa*v.rho*v.theta/v.sigma*v.dt
-                                let K1 = (v.kappa*v.rho/v.sigma-0.5)*v.gamma_1*v.dt-v.rho/v.sigma
-                                let K2 = (v.kappa*v.rho/v.sigma-0.5)*v.gamma_2*v.dt+v.rho/v.sigma
-                                let K3 = (1.0-v.rho**2.0)*v.gamma_1*v.dt
-                                let K4 = (1.0-v.rho**2.0)*v.gamma_2*v.dt
-                                let A = K2+0.5*K4
-                                {K0=K0;K1=K1;K2=K2;K3=K3;K4=K4;A=A}                            
-                            ) 
+        let assets_rho:MathNet.Numerics.LinearAlgebra.Matrix<float> = Utils.frame2Matrix asset_names asset_names assets_rho_frame
+        let vol_rho:MathNet.Numerics.LinearAlgebra.Matrix<float>    = Utils.frame2Matrix asset_names asset_names vol_rho_frame
+        
+        let cube = MCSimCube.generate_cube assets_rho seedS npaths ntimesteps (hestonparams.Count)
+        let cube_vols = MCSimCube.generate_cube vol_rho seedV npaths ntimesteps (hestonparams.Count)
 
+        
+        let Ks = hestonparams |> Map.map(fun key v -> computeK v) 
+        
         let rec compute_asset_path(x:HestonParams,K:Kparams,V:float[],S:float[],dZ_asset:float[],dZ_vol:float[])(n:int):float[]=
             if(n>=S.Length) then
                 S
             else                
-                let dZ= dZ_asset.[n]
+                let dZs= dZ_asset.[n]
                 let dZv = dZ_vol.[n]
                 let m=x.theta + (V.[n-1]-x.theta)*x.E
                 let m2 = m**2.0
@@ -85,12 +95,13 @@ open MathNet.Numerics.Random
                                 -Math.Log(mx)-(K.K1+0.5*K.K3)*V.[n-1]
                             else
                                 K.K0
-
-                S.[n]<-S.[n-1]*Math.Exp((x.rate-x.dividends)*x.dt+K0+K.K1*V.[n-1]+K.K2*V.[n]+Math.Sqrt(K.K3*V.[n-1]+K.K4*V.[n])*dZ)
+                
+                S.[n]<-S.[n-1]*Math.Exp((x.rate-x.dividends)*x.dt+K0+K.K1*V.[n-1]+K.K2*V.[n]+Math.Sqrt(K.K3*V.[n-1]+K.K4*V.[n])*dZs)
                 compute_asset_path(x,K,V,S,dZ_asset,dZ_vol)(n+1)                                       
         //cube is a matrix of correlated npaths x assets x time
         let mc = cube
-                    |> Array.mapi(fun nsim asset_paths ->                            
+                    |> Array.mapi(fun nsim asset_paths ->
+                                                       
                             asset_paths
                             |> Array.mapi(fun nasset s_path ->
                                 let asset = asset_names.[nasset]
@@ -99,13 +110,12 @@ open MathNet.Numerics.Random
                                 let V = Array.zeroCreate(ntimesteps)
                                 let S = Array.zeroCreate(ntimesteps)
                                 V.[0]<-heston_par.V0
-                                S.[0]<-heston_par.S0
-                                
+                                S.[0]<-heston_par.S0                                
                                 compute_asset_path(heston_par,Kparam,V,S,s_path,cube_vols.[nsim].[nasset])(1)
                                 
                             )
                 
                         )
         
-        mc    
+        mc, cube    
         

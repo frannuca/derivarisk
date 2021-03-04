@@ -25,7 +25,7 @@ module MCSimCube=
         let C = rho.Cholesky().Factor
         printfn "Cholesky Factor %A" C
         let path_generator _ =
-            let mcpath = [|0 .. number_assets-1|] |> Array.map(fun _ -> let aux = Array.create(timeSteps) 0.0
+            let mcpath = [|0 .. number_assets-1|] |> Array.map(fun _ -> let aux = Array.zeroCreate(timeSteps)
                                                                         norm.Samples(aux) |> ignore
                                                                         aux                                                         
                                                 )   |> Matrix<float>.Build.DenseOfRowArrays

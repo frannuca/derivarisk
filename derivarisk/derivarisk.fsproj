@@ -7,6 +7,7 @@
     <Compile Include="utils.fs" />
     <Compile Include="simcube.fs" />
     <Compile Include="black.fs" />
+    <Compile Include="gbm.fs" />
     <Compile Include="heston.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -21,6 +22,9 @@
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
     <PackageReference Include="Deedle" Version="2.3.0">
+      <GeneratePathProperty></GeneratePathProperty>
+    </PackageReference>
+    <PackageReference Include="Deedle.Math" Version="2.3.0">
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
   </ItemGroup>

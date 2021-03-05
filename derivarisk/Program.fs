@@ -10,7 +10,7 @@ let main argv =
     let nsim=10000
     let ntime=100
     let T=0.25
-
+    let K=90.0
     let hestonpar = {   HestonParams.dividends=0.02;
                         rate=0.03;
                         kappa=6.2;
@@ -26,9 +26,22 @@ let main argv =
                         threshold_phi=1.5
                      }
 
+    let heston_call = Heston.heston_analytical(hestonpar.S0,
+                                               K,
+                                               hestonpar.kappa,
+                                               0.0,
+                                               T,
+                                               hestonpar.rate,
+                                               hestonpar.dividends,
+                                               hestonpar.rho,
+                                               hestonpar.sigma,
+                                               hestonpar.theta,
+                                               hestonpar.V0,
+                                               true)
+
     let hestonparams=Map([Heston.AssetName("A"),hestonpar;
-                          Heston.AssetName("B"),hestonpar;
-                          Heston.AssetName("C"),hestonpar])
+                          Heston.AssetName("B"),{hestonpar with rho=0.7};
+                          Heston.AssetName("C"),{hestonpar with sigma=0.15}])
 
 
     let rs= 0.5
@@ -58,7 +71,7 @@ let main argv =
         returnValue
 
     let mcpaths, cube = duration (fun () -> Heston.computeMCPaths(rho,rho_vol,nsim,ntime,hestonparams))
-    Utils.writeCsv(mcpaths,"/Users/fran/data/mcpath_multiple_asset.csv")
+    Utils.writeCsv(mcpaths,"/Users/fran/data/mcpath_multiple_asset_different.csv")
 
     let spath = mcpaths.[0]
     let ld = spath

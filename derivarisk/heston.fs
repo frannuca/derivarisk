@@ -168,7 +168,7 @@ open MathNet.Numerics.Integration
             Ia.Real
 
 
-        let I=GaussLegendreRule.Integrate(Func<float,float>(integrand), 0.0, 100.0, 5);
+        let I= GaussLegendreRule.Integrate(Func<float,float>(integrand), 0.0, 100.0, 32);
         let c = 0.5*S*Math.Exp(-q*tau)-0.5*K*Math.Exp(-r*tau)+1.0/Math.PI*I
         if call then                       
             c

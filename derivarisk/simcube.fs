@@ -23,7 +23,7 @@ module MCSimCube=
         let rndgen = new MersenneTwister(seed,true)
         let norm = new MathNet.Numerics.Distributions.Normal(rndgen)
         let C = rho.Cholesky().Factor
-        printfn "Cholesky Factor %A" C
+        //printfn "Cholesky Factor %A" C
         let path_generator _ =
             let mcpath = [|0 .. number_assets-1|] |> Array.map(fun _ -> let aux = Array.zeroCreate(timeSteps)
                                                                         norm.Samples(aux) |> ignore

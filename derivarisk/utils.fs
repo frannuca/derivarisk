@@ -25,3 +25,11 @@ module Utils=
     let writeCsv(mcpaths:float[][][],filepath)=        
         use stream = new System.IO.StreamWriter(filepath,false)
         mcpaths |> Array.iteri(fun nsim assets -> assets|>Array.iteri(fun nasset asset -> stream.WriteLine(nsim.ToString()+","+nasset.ToString()+","+String.Join(",",asset))))
+
+    let linspace minval maxval nsteps=
+        [|0 .. nsteps-1|]
+        |> Array.map(fun n -> minval+ float(n)/float(nsteps-1)*(maxval-minval))
+
+    type OptionType=
+        |CALL
+        |PUT

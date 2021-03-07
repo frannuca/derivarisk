@@ -20,7 +20,7 @@ module GBM=
      let computeMCPaths(assets_rho:Matrix<float>,                       
                         npaths:int,
                         ntimesteps:int,
-                        x:GBMParams)=
+                        x:GBMParams[])=
 
          let cube = MCSimCube.generate_cube assets_rho seedS npaths ntimesteps (assets_rho.ColumnCount)         
                   
@@ -38,8 +38,8 @@ module GBM=
                              asset_paths
                              |> Array.mapi(fun nasset s_path ->
                                 let S = Array.zeroCreate ntimesteps
-                                S.[0]<-x.S0
-                                compute_asset_path_exp(x,S,s_path)(1)
+                                S.[0]<-x.[nasset].S0
+                                compute_asset_path_exp(x.[nasset],S,s_path)(1)
                              )
                  
                          )

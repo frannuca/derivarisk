@@ -11,6 +11,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="choleskyTest.fs" />
+    <Compile Include="gbmTest.fs" />
+    <Compile Include="hestonOptionTests.fs" />
+    <Compile Include="HestonMultiAssetPriceTest.fs" />
+    <Compile Include="HestonBarrierOptionTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

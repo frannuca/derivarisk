@@ -17,14 +17,13 @@ module HestonBarrier=
 
 
     let barrierprice(nsim:int,
-                             ntime:int,
-                             hestonParams:Map<Heston.AssetName,Heston.HestonParams>,
-                             rhoS:Frame<Heston.AssetName,Heston.AssetName>,
-                             rhoVol:Frame<Heston.AssetName,Heston.AssetName>,
-                             K:float,
-                             barrier:BARRIERTYPE,
-                             optionType:OptionType
-                             )=
+                     ntime:int,
+                     hestonParams:Map<Heston.AssetName,Heston.HestonParams>,
+                     rhoS:Frame<Heston.AssetName,Heston.AssetName>,
+                     rhoVol:Frame<Heston.AssetName,Heston.AssetName>,
+                     K:float,
+                     barrier:BARRIERTYPE,
+                     optionType:OptionType)=
 
         let mcpaths, _ = Heston.computeMCPaths(rhoS,rhoVol,nsim,ntime,hestonParams)
 

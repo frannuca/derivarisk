@@ -59,27 +59,11 @@ let TestPriceUpKnockInCall()=
  
     let assets = [Heston.AssetName "A"]
     let rho = Matrix<float>.Build.DenseOfRowArrays([|[|1.0|] |]) |> Utils.matrix2Frame assets assets
-
-    let mcpaths, _ = duration (fun () -> Heston.computeMCPaths(rho,rho,nsim,ntime,hestonparams))
-    //Utils.writeCsv(mcpaths,"/Users/fran/data/mcpath_single_asset.csv")
-
-
-    let payoff path:float =
-        let internal_payoff active spot=
-            if spot >= BL || active then
-                Math.Max(spot-K,0.0), true
-            else 
-                0.0, false
-        
-        let (sT,active) = path |> Array.fold(fun active s -> internal_payoff (active|>snd) s) (0.0,false)
-        sT
-
-    let price= mcpaths
-                |> Array.map(fun assets -> assets|> Array.map(payoff) |> Array.sum)
-                |> Array.average
-                       
-
-
-    printfn "Price Call Option=%f MC price =%f " heston_call price
-    Assert.Greater(price,heston_call)
+    let getpar =
+        [(Heston.AssetName("A"),hestonParams)]|>Map.ofSeq
+    let barrier = UpIn BL
+    let mcprice= HestonBarrier.barrierprice(nsim,ntime,getpar,rho,rho,K,barrier,CALL)
+    
+    printfn "Price Call Option=%f MC price =%f " heston_call mcprice
+    Assert.Less(mcprice,heston_call)
 

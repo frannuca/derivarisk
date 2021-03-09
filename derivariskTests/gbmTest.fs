@@ -32,8 +32,16 @@ let TestGBMCorrelation()=
         printfn "Elapsed Time: %i" timer.ElapsedMilliseconds
         returnValue
 
-    let par = {GBMParams.rate=0.02;dt=T/float(ntime);sigma=0.15;S0=100.0}
-    let mcpaths,cube = duration (fun () -> GBM.computeMCPaths(rho,nsim,ntime,[|par;par;par|]))
+    let par = {GBMParams.rate=0.02;dt=T/float(ntime);sigma= (fun _ _ -> 0.15);S0=100.0}
+
+    let mcpar = {SimCubeData.nsim=nsim;
+                 SimCubeData.ntimesteps=ntime;
+                 SimCubeData.number_assets=rho.ColumnCount;
+                 SimCubeData.rho=rho;
+                 SimCubeData.seed=seedS;
+                }
+
+    let mcpaths,cube = duration (fun () -> GBM.computeMCPaths mcpar (Array.create (rho.ColumnCount) par))
     
     let spath = mcpaths.[0]
     let ld = spath |> Array.map(fun path ->[|1 .. path.Length-1|] |> Array.map(fun n -> path.[n]/(path.[n-1])))

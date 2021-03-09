@@ -1,4 +1,4 @@
-﻿namespace pricing
+﻿namespace DerivaRisk
 
 module Black=
     open MathNet.Numerics.LinearAlgebra

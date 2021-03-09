@@ -1,8 +1,9 @@
 ﻿namespace DerivaRisk
-open Deedle
+
 module MCSimCube=
     open MathNet.Numerics.LinearAlgebra
     open MathNet.Numerics.Random
+    open Deedle
    
 
     (*
@@ -19,7 +20,13 @@ module MCSimCube=
                     -[2]-> time step index
         </returns>
     *)
-    let generate_cube(rho:Matrix<float>)(seed:int)(npaths:int)(timeSteps:int)(number_assets:int):float[][][]=
+    let generate_cube(config:SimCubeData):float[][][]=
+        let rho = config.rho
+        let seed = config.seed
+        let number_assets = config.number_assets
+        let timeSteps = config.ntimesteps
+        let npaths = config.nsim
+
         let rndgen = new MersenneTwister(seed,true)
         let norm = new MathNet.Numerics.Distributions.Normal(rndgen)
         let C = rho.Cholesky().Factor

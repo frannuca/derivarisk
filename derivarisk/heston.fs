@@ -55,8 +55,20 @@ open MathNet.Numerics.Integration
         let assets_rho:MathNet.Numerics.LinearAlgebra.Matrix<float> = Utils.frame2Matrix asset_names asset_names assets_rho_frame
         let vol_rho:MathNet.Numerics.LinearAlgebra.Matrix<float>    = Utils.frame2Matrix asset_names asset_names vol_rho_frame
         
-        let cube = MCSimCube.generate_cube assets_rho seedS npaths ntimesteps (hestonparams.Count)
-        let cube_vols = MCSimCube.generate_cube vol_rho seedV npaths ntimesteps (hestonparams.Count)
+        let cube = MCSimCube.generate_cube {SimCubeData.nsim=npaths;
+                                            SimCubeData.ntimesteps=ntimesteps;
+                                            SimCubeData.number_assets=hestonparams.Count;
+                                            SimCubeData.rho=assets_rho;
+                                            SimCubeData.seed=seedS;
+                                            }
+
+        let cube_vols = MCSimCube.generate_cube {SimCubeData.nsim=npaths;
+                                                 SimCubeData.ntimesteps=ntimesteps;
+                                                 SimCubeData.number_assets=hestonparams.Count;
+                                                 SimCubeData.rho=vol_rho;
+                                                 SimCubeData.seed=seedV;
+                                                }
+         
 
         
         let Ks = hestonparams |> Map.map(fun key v -> computeK v) 

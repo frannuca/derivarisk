@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="utils.fs" />
+    <Compile Include="commons.fs" />
     <Compile Include="simcube.fs" />
     <Compile Include="black.fs" />
     <Compile Include="gbm.fs" />

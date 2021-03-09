@@ -6,12 +6,7 @@ open Heston
 open System.IO
 open Deedle
 module HestonBarrier=
-    
-    type BARRIERTYPE=
-        |DownOut of float
-        |UpOut of float
-        |DownIn of float
-        |UpIn of float
+
 
     let duration f = 
          let timer = new System.Diagnostics.Stopwatch()
@@ -28,15 +23,15 @@ module HestonBarrier=
                              rhoVol:Frame<Heston.AssetName,Heston.AssetName>,
                              K:float,
                              barrier:BARRIERTYPE,
-                             optionType:Utils.OptionType
+                             optionType:OptionType
                              )=
 
         let mcpaths, _ = Heston.computeMCPaths(rhoS,rhoVol,nsim,ntime,hestonParams)
 
         let terminalpayoff S =
             match optionType with
-            |Utils.CALL -> Math.Max(S-K,0.0)
-            |Utils.PUT-> Math.Max(K-S,0.0)
+            |CALL -> Math.Max(S-K,0.0)
+            |PUT-> Math.Max(K-S,0.0)
 
         let tpayoff= match barrier with
                         |UpIn(bl) ->

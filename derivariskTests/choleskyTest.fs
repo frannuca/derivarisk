@@ -21,8 +21,14 @@ let TestCholesky () =
     let ntime=100
     let nassets=2
     let seed=42
-    let cube = MCSimCube.generate_cube  rho seed nsim ntime nassets
-    
+    //rho seed nsim ntime nassets
+    let cube = MCSimCube.generate_cube  {SimCubeData.nsim=nsim;
+                                         SimCubeData.ntimesteps=ntime;
+                                         SimCubeData.number_assets=nassets;
+                                         SimCubeData.rho=rho;
+                                         SimCubeData.seed=seed
+                                        }
+
 
     let crho = ([for path in cube do yield MathNet.Numerics.Statistics.Correlation.PearsonMatrix(path)]
                 |>Seq.toArray

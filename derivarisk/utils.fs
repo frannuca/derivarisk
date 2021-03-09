@@ -29,7 +29,3 @@ module Utils=
     let linspace minval maxval nsteps=
         [|0 .. nsteps-1|]
         |> Array.map(fun n -> minval+ float(n)/float(nsteps-1)*(maxval-minval))
-
-    type OptionType=
-        |CALL
-        |PUT

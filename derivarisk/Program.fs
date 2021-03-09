@@ -35,10 +35,10 @@ let main argv =
     let getpar x=
         [(Heston.AssetName("A"),{hestonParams with S0=x})]|>Map.ofSeq
     let Smin=90.0
-    let Smax=125.0
+    let Smax=120.0
     let nS = 200
     let K=100.0
-    let barrier = HestonBarrier.BARRIERTYPE.UpOut(120.0)
+    let barrier = BARRIERTYPE.UpOut(110.0) 
 
     //let aaa= HestonBarrier.barrierprice(nsim,ntime,getpar Smin,rhos,rhos,K,HestonBarrier.BARRIERTYPE.DownOut(90.0),Utils.CALL)
     //let prices_callupout = Utils.linspace Smin Smax nS
@@ -64,13 +64,15 @@ let main argv =
     //                        |> Series.ofObservations
 
     let saxis = Utils.linspace Smin Smax nS
-    let ds = saxis.[1]-saxis.[0]
+    let dN = 4
+    let ds = saxis.[3]-saxis.[0]
+    let dsn = saxis.[dN-1]-saxis.[0]
     
     let mcprice = saxis
                             |> Array.Parallel.map(fun S->
                                     printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
                                     S,
-                                    HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,K,barrier,Utils.CALL))                    
+                                    HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,K,barrier,CALL))                    
                             |> Series.ofObservations |>Series.sortByKey
 
     let prices_call = saxis
@@ -80,7 +82,7 @@ let main argv =
                                       Heston.heston_analytical(S,100.0,hestonParams.kappa,0.0,T,hestonParams.rate,hestonParams.dividends,hestonParams.rho,hestonParams.sigma,hestonParams.theta,hestonParams.V0,true)                    )
                               |> Series.ofObservations |>Series.sortByKey                                
     printfn("FINISHED  Monte Carlo Calculation")
-    let deltas = (mcprice |> Series.diff(1)) / ds
+    let deltas = (mcprice |> Series.diff(4)) / dsn
     let gammas =  (deltas |> Series.diff(1)) / ds
     printfn("FINISHED  Greeks Calculation")
     //let frame = Frame.ofColumns["UpOut"=>prices_callupout;"Call_DownOut"=>prices_calldownout;"Call_UpIn"=>prices_callupin;"Call_DownIn"=>prices_calldownIn]

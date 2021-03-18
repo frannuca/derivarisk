@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema elementFormDefault="qualified"
+        xmlns="http://www.frannuca.org/quantrisk/marketdata"
+        targetNamespace="http://www.frannuca.org/quantrisk/marketdata"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:instr="http://www.frannuca.org/quantrisk/instrument"
+        xmlns:commons="http://www.frannuca.org/quantrisk/commons">
+    
+<xs:import namespace="http://www.frannuca.org/quantrisk/commons" schemaLocation="commons.xsd"/>
+<xs:import namespace="http://www.frannuca.org/quantrisk/instrument" schemaLocation="instrument.xsd"/>
+
+
+<xs:complexType name="MDseries">
+     <xs:complexContent>
+    <xs:extension base="commons:Identifier">
+    <xs:sequence>        
+         <xs:element name="timeunits" type="commons:TimeUnits"/>
+         <xs:element name="points" type="commons:Point" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+      </xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+
+
+<xs:complexType name="HestonVolatility">
+     <xs:complexContent>
+    <xs:extension base="commons:Identifier">
+    <xs:sequence>        
+         <xs:element name="theta" type="xs:double"/>
+         <xs:element name="kappa" type="xs:double"/>
+         <xs:element name="Vo" type="xs:double"/>
+         <xs:element name="lambda" type="xs:double"/>
+         <xs:element name="sigma" type="xs:double"/>
+         <xs:element name="rho" type="xs:double"/>
+         <xs:element name="gamma1" type="xs:double"/>
+         <xs:element name="gamma2" type="xs:double"/>
+    </xs:sequence>
+    </xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+<xs:element name="Marketdata">
+<xs:complexType>
+    <xs:sequence>   
+      <xs:element name="referenceDate" type="xs:date"/>
+      <xs:element name="dividends" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>
+      <xs:element name="volalities" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
+      <xs:element name="spots" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
+      <xs:element name="rates" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
+      <xs:element name="stochasticVolatilities" minOccurs="0" maxOccurs="unbounded"  type="HestonVolatility"/>      
+    </xs:sequence>     
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="SimulationCube">
+  <xs:complexType>
+    <xs:sequence>                 
+      <xs:element name="number_of_simulations" type="xs:unsignedInt"/>
+      <xs:element name="number_of_time_steps"  type="xs:unsignedInt"/>
+      <xs:element name="number_of_assets"  type="xs:unsignedInt"/>
+      <xs:element name="dt" type="xs:float"/>
+      <xs:element name="assets_correlation" type="CorrelationMatrix"/>
+      <xs:element name="dt" type="xs:float"/>
+      <xs:element name="seed" type="xs:unsignedInt"/>
+      <xs:element name="seed2" type="xs:unsignedInt"/>
+    </xs:sequence>     
+  </xs:complexType>
+</xs:element>
+
+
+
+<xs:complexType name="CorrelationMatrix">
+    <xs:sequence>        
+        <xs:element name="data" maxOccurs="unbounded" type="xs:double"/>
+        <xs:element name="assets" maxOccurs="unbounded" type="xs:string"/>
+        <xs:element name="isRowMajor" type="xs:boolean"/>
+    </xs:sequence>
+</xs:complexType>
+
+</xs:schema>

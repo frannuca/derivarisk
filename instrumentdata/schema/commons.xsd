@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema elementFormDefault="qualified"
+        xmlns="http://www.frannuca.org/quantrisk/commons"
+        targetNamespace="http://www.frannuca.org/quantrisk/commons"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+<xs:complexType name="Period">
+    <xs:sequence>
+        <xs:element name="startdate" type="xs:date"/>
+        <xs:element name="enddate" type="xs:date"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Schedule">
+    <xs:sequence>
+        <xs:element name="frequency" type="Frequency"/>
+        <xs:element name="number_of_periods" type="xs:unsignedInt"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="BarrierType">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="UpIn" />
+        <xs:enumeration value="UpOut" />
+        <xs:enumeration value="DownIn" />
+        <xs:enumeration value="DownOut" />
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="Frequency">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="Daily" />
+        <xs:enumeration value="Weekly" />
+        <xs:enumeration value="Monthly" />
+        <xs:enumeration value="Quarterly" />
+        <xs:enumeration value="Semiannual" />
+        <xs:enumeration value="Annual" />
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="Identifier">
+    <xs:sequence>
+        <xs:element name="weight" type="xs:double" default="1.0"/>
+        <xs:element name="id" type="xs:string"/>
+        <xs:element name="name" type="xs:string"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="DividendType">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="Absolute" />
+        <xs:enumeration value="Proportional" />
+        <xs:enumeration value="Yield" />        
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="TimeUnits">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="days" />
+        <xs:enumeration value="weeks" />
+        <xs:enumeration value="months" />
+        <xs:enumeration value="years" />        
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="Point">
+    <xs:sequence>
+        <xs:element name="x" type="xs:double"/>
+        <xs:element name="y" type="xs:double"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Curve">
+    <xs:sequence>
+        <xs:element name="points" type="Point" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="id" type="Identifier"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:simpleType name="AmountType">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="ABSOLUTE" />
+        <xs:enumeration value="PERCENTAGE" />        
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="OptionType">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="CALL" />
+        <xs:enumeration value="PUT" />        
+    </xs:restriction>
+</xs:simpleType>
+
+
+<xs:simpleType name="CurrencyISOCode">
+    <xs:restriction base="xs:string">
+        <xs:pattern value="[A-Z]{3}"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="Currency">
+     <xs:complexContent>
+    <xs:extension base="Identifier">
+    <xs:sequence>        
+         <xs:element name="isocode" type="CurrencyISOCode"/>
+    </xs:sequence>
+    </xs:extension>
+</xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="Amount">
+    <xs:sequence>
+        <xs:element name="amount" type="xs:double"/>
+        <xs:element name="amountType" type="AmountType"/>
+    </xs:sequence>
+</xs:complexType>
+
+
+<xs:simpleType name="DayCountConvention">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="THIRTY_360" />
+        <xs:enumeration value="THIRTY_365" />
+        <xs:enumeration value="ACTUAL" />
+        <xs:enumeration value="ACTUAL" />
+        <xs:enumeration value="ACTUAL_ACTUAL" />
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="BasketAggregation">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="WORSTOF" />
+        <xs:enumeration value="BESTOF" />
+        <xs:enumeration value="AVERAGE" />        
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="DateAdjustment">
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="NoAdjustment"/>
+        <xs:enumeration value="Previous"/>
+        <xs:enumeration value="Following"/>
+        <xs:enumeration value="ModifiedPrevious"/>
+        <xs:enumeration value="ModifiedFollowing"/>
+        <xs:enumeration value="EndOfMonth_NoAdj"/>
+        <xs:enumeration value="EndOfMonth_Previous"/>
+        <xs:enumeration value="EndOfMonth_Following"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="Barrier">  
+    <xs:sequence>
+    <xs:element name="level" type="Amount"/>
+    <xs:element name="barrierType" type="BarrierType"/>
+    </xs:sequence>
+</xs:complexType>
+
+
+
+</xs:schema>

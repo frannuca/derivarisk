@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema elementFormDefault="qualified"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:commons="http://www.frannuca.org/quantrisk/commons"
+        xmlns:instr="http://www.frannuca.org/quantrisk/instrument"
+        xmlns="http://www.frannuca.org/quantrisk/portfolio"
+        targetNamespace="http://www.frannuca.org/quantrisk/portfolio">
+
+<!--<xs:include  schemaLocation="./instrument.xsd" />-->
+<xs:import namespace="http://www.frannuca.org/quantrisk/commons" schemaLocation="commons.xsd"/>
+<xs:import namespace="http://www.frannuca.org/quantrisk/instrument" schemaLocation="instrument.xsd"/>
+
+<xs:element name="Portfolio">
+  <xs:complexType>
+    <xs:sequence>                 
+      <xs:element name="instruments" minOccurs="0" maxOccurs="unbounded"  type="instr:Instrument"/>      
+    </xs:sequence>     
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>

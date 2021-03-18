@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "derivarisk", "derivarisk\de
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "derivariskTests", "derivariskTests\derivariskTests.fsproj", "{0F7A22DB-E31C-451B-B075-61849AC92578}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "instrumentdata", "instrumentdata\instrumentdata.csproj", "{F0066C89-4DBB-4503-B337-9F873978EA9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0F7A22DB-E31C-451B-B075-61849AC92578}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7A22DB-E31C-451B-B075-61849AC92578}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7A22DB-E31C-451B-B075-61849AC92578}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0066C89-4DBB-4503-B337-9F873978EA9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0066C89-4DBB-4503-B337-9F873978EA9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0066C89-4DBB-4503-B337-9F873978EA9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0066C89-4DBB-4503-B337-9F873978EA9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

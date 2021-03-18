@@ -3,91 +3,113 @@
 open System
 open DerivaRisk
 open MathNet.Numerics.LinearAlgebra
-open Heston
-open GBM
 open Deedle
+open InstrumentData
+open DerivaRisk.model
 
 [<EntryPoint>]
 let main argv =
-    let nsim=20000
-    let ntime=50
-    let T=0.25
-    let hestonParams = {    HestonParams.dividends=0.02;
-                            rate=0.03;
-                            kappa=6.2;
-                            theta=0.06;
-                            sigma=0.20;
-                            rho= -0.7;
-                            lambda=0.0;
-                            S0=100.0;
-                            V0=0.03;
-                            dt=T/float ntime;
-                            gamma_1=0.5;
-                            gamma_2=0.5;
-                            threshold_phi=1.5}
 
-    
-   
-    let rhos = [|[|1.0|]|]
-                |> Matrix<float>.Build.DenseOfColumnArrays
-                |> Utils.matrix2Frame [Heston.AssetName "A"] [Heston.AssetName "A"]
+    let basket = Basket()
+    basket.components <- Array.init(1)(fun _ -> Identifier())
 
-    let getpar x=
-        [(Heston.AssetName("A"),{hestonParams with S0=x})]|>Map.ofSeq
-    let Smin=90.0
-    let Smax=120.0
-    let nS = 200
-    let K=100.0
-    let barrier = BARRIERTYPE.UpOut(110.0) 
-
-    //let aaa= HestonBarrier.barrierprice(nsim,ntime,getpar Smin,rhos,rhos,K,HestonBarrier.BARRIERTYPE.DownOut(90.0),Utils.CALL)
-    //let prices_callupout = Utils.linspace Smin Smax nS
-    //                        |> Array.map(fun S->
-    //                                printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
-    //                                S,
-    //                                HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,K,HestonBarrier.BARRIERTYPE.UpOut(110.0),Utils.CALL))                    
-    //                        |> Series.ofObservations
-    //let prices_calldownout = Utils.linspace Smin Smax nS
-    //                            |> Array.map(fun S->
-    //                                    printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
-    //                                    S,
-    //                                    HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,K,HestonBarrier.BARRIERTYPE.DownOut(85.0),Utils.CALL))                    
-    //                            |> Series.ofObservations
+    basket.components.[0]<- Identifier()
+    basket.components.[0].id<-"AAA"
+    basket.components.[0].name<-"Stock"
+    basket.components.[0].weight<-1.0
 
 
 
-    //let prices_callupin = Utils.linspace 30.0 80.0 nS
-    //                        |> Array.map(fun S->
-    //                                printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
-    //                                S,
-    //                                HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,40.0,HestonBarrier.BARRIERTYPE.UpIn(65.0),Utils.CALL))                    
-    //                        |> Series.ofObservations
+    let voption = OptionBase()
+    voption.basket<-basket;
 
-    let saxis = Utils.linspace Smin Smax nS
-    let dN = 4
-    let ds = saxis.[3]-saxis.[0]
-    let dsn = saxis.[dN-1]-saxis.[0]
-    
-    let mcprice = saxis
-                            |> Array.Parallel.map(fun S->
-                                    printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
-                                    S,
-                                    HestonBarrier.barrierprice(nsim,ntime,getpar S,rhos,rhos,K,barrier,CALL))                    
-                            |> Series.ofObservations |>Series.sortByKey
+    voption.currency<- Currency()
+    voption.currency.id<-"chf"
+    voption.currency.isocode<-"CHF"
+    voption.currency.name<-"Swiss Franc"
 
-    let prices_call = saxis
-                              |> Array.Parallel.map(fun S->
-                                      printfn "Simulating S=%f in range [%f,%f]" S Smin Smax
-                                      S,
-                                      Heston.heston_analytical(S,100.0,hestonParams.kappa,0.0,T,hestonParams.rate,hestonParams.dividends,hestonParams.rho,hestonParams.sigma,hestonParams.theta,hestonParams.V0,true)                    )
-                              |> Series.ofObservations |>Series.sortByKey                                
-    printfn("FINISHED  Monte Carlo Calculation")
-    let deltas = (mcprice |> Series.diff(4)) / dsn
-    let gammas =  (deltas |> Series.diff(1)) / ds
-    printfn("FINISHED  Greeks Calculation")
-    //let frame = Frame.ofColumns["UpOut"=>prices_callupout;"Call_DownOut"=>prices_calldownout;"Call_UpIn"=>prices_callupin;"Call_DownIn"=>prices_calldownIn]
-    let frame = Frame.ofColumns["analytical"=>prices_call;"prices_call_downIn"=>mcprice;"delta"=>deltas;"gamma"=>gammas]
-    printfn("Creating Frame")
-    frame.SaveCsv("/Users/fran/data/price_analysis.csv",["Spot"],',')
-    printfn("Frame saved")
+    voption.expiry <- DateTime(2020,03,31)
+    voption.startdate <- DateTime(2020,01,01)
+
+    voption.id <- "European Call"
+    voption.optionType<-OptionType.CALL
+    voption.strike<-Amount()
+    voption.strike.amount<-90.0
+    voption.strike.amountType <- AmountType.ABSOLUTE
+
+    let simconfig = SimulationCube()
+    simconfig.number_of_assets<- uint32(1)
+    simconfig.number_of_simulations <- uint32(5000)
+    simconfig.number_of_time_steps <- uint32(100)
+    simconfig.seed <- uint32(42)
+    simconfig.seed2 <- uint32(51)
+    simconfig.dt <- float32(0.25/float simconfig.number_of_time_steps)
+    simconfig.dt1 <- float32(1.0/365.0)
+    simconfig.assets_correlation <- CorrelationMatrix()
+    simconfig.assets_correlation.assets <- [|"AAA"|]
+    simconfig.assets_correlation.isRowMajor<-true
+    simconfig.assets_correlation.data <- [|1.0|]
+
+
+    let md = Marketdata()
+    md.rates <- Array.init 1 (fun _ -> MDseries())
+    md.rates.[0].id<-"chf"
+    md.rates.[0].points <- [|Point();Point()|]
+    md.rates.[0].points.[0].x <- 0.0
+    md.rates.[0].points.[0].y <- 0.03
+    md.rates.[0].points.[1].x <- 1.0
+    md.rates.[0].points.[1].y <- 0.03
+    md.rates.[0].timeunits <- TimeUnits.years
+
+    md.dividends <- Array.init 1 (fun _ -> MDseries())
+    md.dividends.[0].id<-"chf"
+    md.dividends.[0].points <- [|Point();Point()|]
+    md.dividends.[0].points.[0].x <- 0.0
+    md.dividends.[0].points.[0].y <- 0.02
+    md.dividends.[0].points.[1].x <- 1.0
+    md.dividends.[0].points.[1].y <- 0.02
+    md.dividends.[0].timeunits <- TimeUnits.years
+
+    md.stochasticVolatilities <- [|HestonVolatility()|]
+    md.stochasticVolatilities.[0].gamma1 <- 0.5
+    md.stochasticVolatilities.[0].gamma2 <- 0.5
+    md.stochasticVolatilities.[0].id <- "AAA"
+    md.stochasticVolatilities.[0].kappa <- 6.2
+    md.stochasticVolatilities.[0].lambda <- 0.0
+    md.stochasticVolatilities.[0].name <- "AAA"
+    md.stochasticVolatilities.[0].rho <- -0.7 
+    md.stochasticVolatilities.[0].sigma <- 0.5
+    md.stochasticVolatilities.[0].theta <- 0.06
+    md.stochasticVolatilities.[0].Vo <- 0.03
+
+    md.referenceDate <- DateTime(2020,01,01)
+
+    md.spots <- [|MDseries()|]
+    md.spots.[0].id<-"AAA"
+    md.spots.[0].weight <- 1.0
+    md.spots.[0].points <- [|Point();Point()|]
+    md.spots.[0].points.[0].x <- 0.0
+    md.spots.[0].points.[0].y <- 100.0
+    md.spots.[0].points.[1].x <- 1.0
+    md.spots.[0].points.[1].y <- 100.0
+    md.spots.[0].timeunits <- TimeUnits.years
+    let pricer= MonteCarloHeston(simconfig,voption,md) :> IModel
+    let npv = pricer.compute([|ComputationSelection.NPV|]) voption md
+
+    let analytical = HestonAnalytical() :> IModel
+    let npv2 = analytical.compute([|ComputationSelection.NPV|]) voption md
     0 // return an integer exit code
+    (*
+    HestonParams.dividends=0.02;
+    rate=0.03;
+    kappa=6.2;
+    theta=0.06;
+    sigma=0.5;
+    rho= -0.7;
+    lambda=0.0;
+    S0=100.0;
+    V0=0.03;
+    dt=T/float ntime;
+    gamma_1=0.5;
+    gamma_2=0.5;
+    threshold_phi=1.5*)

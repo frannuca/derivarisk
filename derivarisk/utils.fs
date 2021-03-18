@@ -2,7 +2,6 @@
 
 module Utils=
     open System
-    open MathNet.Numerics.LinearAlgebra
     open FSharp.Stats
     open Deedle
     open Deedle.Math

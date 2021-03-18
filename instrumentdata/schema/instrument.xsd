@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified"
+        xmlns="http://www.frannuca.org/quantrisk/instrument"        
+        targetNamespace="http://www.frannuca.org/quantrisk/instrument"
+        xmlns:commons="http://www.frannuca.org/quantrisk/commons"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:import namespace="http://www.frannuca.org/quantrisk/commons" schemaLocation="./commons.xsd"/>
+
+<xs:complexType name="CashFlow">
+    <xs:sequence>
+        <xs:element name="Nominal" type="xs:double"/>
+        <xs:element name="rateId" type="commons:Identifier"/>
+        <xs:element name="daycount" type="commons:DayCountConvention"/>
+        <xs:element name="dateAdjustment" type="commons:DateAdjustment"/>
+        <xs:element name="schedule" type="commons:Schedule"/>
+    </xs:sequence>   
+</xs:complexType>
+
+
+<xs:complexType name="Basket">
+    <xs:sequence>
+        <xs:element name="components" maxOccurs="unbounded" type="commons:Identifier"/>    
+        <xs:element name="basketAggregation" type="commons:BasketAggregation"/>    
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="Instrument">
+        <xs:complexContent>
+    <xs:extension base="commons:Identifier">
+    <xs:sequence>        
+        <xs:element name="expiry" type="xs:date"/>
+        <xs:element name="startdate" type="xs:date"/>
+        <xs:element name="settlementdate" type="xs:date"/>
+        <xs:element name="currency" type="commons:Currency"/>        
+        <xs:element name="daycount" type="commons:DayCountConvention"/>
+        <xs:element name="dateAdjustment" type="commons:DateAdjustment"/>
+    </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+
+
+<xs:complexType name="OptionBase">
+    <xs:complexContent>
+    <xs:extension base="Instrument">
+        <xs:sequence>
+        <xs:element name="strike" type="commons:Amount"/>
+        <xs:element name="basket" type="Basket" minOccurs="0" maxOccurs="1" />
+         <xs:element name="barrier" minOccurs="0" maxOccurs="2" type="commons:Barrier"/>
+        <xs:element name="optionType" type="commons:OptionType"/>
+        </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+
+
+<xs:complexType name="Forward">
+    <xs:complexContent>
+    <xs:extension base="Instrument">
+        <xs:sequence>
+        <xs:element name="forwardstartdate" type="xs:date"/>
+        <xs:element name="basket" type="Basket" minOccurs="0" maxOccurs="1" />     
+        </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="InterestRateSwap">
+    <xs:complexContent>
+    <xs:extension base="Instrument">
+        <xs:sequence>
+            <xs:element name="leg_1" type="CashFlow"/>
+            <xs:element name="leg_2" type="CashFlow"/>            
+        </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="TotalReturnSwap">
+    <xs:complexContent>
+    <xs:extension base="Instrument">
+        <xs:sequence>
+            <xs:element name="leg_1" type="CashFlow"/>
+            <xs:element name="leg_2" type="Basket"/>
+        </xs:sequence>
+    </xs:extension>
+    </xs:complexContent>
+</xs:complexType>
+</xs:schema>

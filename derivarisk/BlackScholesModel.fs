@@ -7,6 +7,7 @@ open Deedle
 
 type BlackScholesModel()=
     let N x = Normal.CDF(0.0,1.0,x)
+    let fN x = Normal.PDF(0.0,1.0,x)
 
     let validate_data(vanillaoption:OptionBase)=
         if vanillaoption = null then
@@ -17,8 +18,12 @@ type BlackScholesModel()=
 
         vanillaoption
 
+    let mutable greek_delta:Option<float>=None
+    let mutable greek_gamma:Option<float>=None
+    
     interface IModel with
-        member self.compute (flags:ComputationSelection array)(instr:Instrument)(md:Marketdata):ModelResult=
+
+        member self.npv(instr:Instrument)(md:Marketdata):float=
             
             let vanillaoption = instr :?> OptionBase |> validate_data
             
@@ -39,19 +44,37 @@ type BlackScholesModel()=
             
             let r = Extractors.Integrate_Rate md vanillaoption.currency (t,T)
             let q = Extractors.Integrate_Dividends md vanillaoption.currency (t,T)
-                                   
-            let npv=
+            let d_1 = d1 So K (T-t) sigma (r-q)
+            let d_2 = d_1-sigma*sqrt(T-t)
+
+            greek_gamma <- Some(fN(d_1)/(So*sigma*sqrt(T-t)))
+
+            let npv,deltag=
                     match vanillaoption.optionType with
-                    |OptionType.CALL -> 
-                                        let d_1 = d1 So K (T-t) sigma (r-q)
-                                        let d_2 = d_1-sigma*sqrt(T-t)
-                                        So*N(d_1)-K*N(d_2)
+                    |OptionType.CALL ->                                         
+                                        So*N(d_1)-K*N(d_2),N(d_1)
                 
-                    |OptionType.PUT ->
-                                        let d_1 = d1 So K (T-t) sigma (r-q)
-                                        let d_2 = d_1-sigma*sqrt(T)
-                                        K*exp(-(r-q)*(T-t))*N(-d_2)-So*N(-d_1)
+                    |OptionType.PUT ->                                       
+                                        K*exp(-(r-q)*(T-t))*N(-d_2)-So*N(-d_1),N(d_1)-1.0
                             
                     |_ -> failwith (sprintf "Unknown Option Type")
 
-            {ModelResult.npv=npv;delta=None;gamma=None;theta=None;rho=None}
+            greek_delta <- Some(deltag)
+            npv
+
+        member self.greekDelta(instr:Instrument)(md:Marketdata):float array=           
+
+            match greek_delta with
+            |Some(x)-> [|x|]
+            | _ -> let price = (self :> IModel).npv instr md
+                   [|greek_delta |> defaultArg <| 0.0|]
+            
+
+        member self.greekGamma(instr:Instrument)(md:Marketdata):float array=
+          
+            match greek_gamma with
+            |Some(x)-> [|x|]
+            | _ -> let price = (self :> IModel).npv instr md
+                   [|greek_gamma |> defaultArg <| 0.0|]
+                    
+   

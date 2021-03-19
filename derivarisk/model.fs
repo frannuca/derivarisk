@@ -3,7 +3,7 @@
 open InstrumentData
 open MathNet.Numerics.LinearAlgebra
 
-type ModelResult={npv:float;delta:Vector<float> option;gamma:Matrix<float> option;theta:float option;rho:float option}
+type ModelResult={npv:float;delta:float array option;gamma:Matrix<float> option;theta:float option;rho:float option}
 type ComputationSelection=
     |NPV
     |Delta
@@ -13,4 +13,6 @@ type ComputationSelection=
 
 [<Interface>]
 type IModel=
-    abstract compute: ComputationSelection array->Instrument->Marketdata->ModelResult
+    abstract npv: Instrument->Marketdata->float
+    abstract greekDelta: Instrument->Marketdata->float array
+    abstract greekGamma: Instrument->Marketdata->float array

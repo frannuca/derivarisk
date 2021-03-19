@@ -23,8 +23,8 @@ type HestonParams={
 } with member self.E = exp(-self.kappa*self.dt)
 
 
-type MonteCarloHeston(simconfig:SimulationCube,instr:Instrument,md:Marketdata)=
-    inherit MonteCarloModel(simconfig,instr,md)
+type MonteCarloHeston(simconfig:SimulationCube,instr:Instrument)=
+    inherit MonteCarloModel(simconfig,instr)
     
     let computeK(v:HestonParams):Kparams=
            let K0 = -v.kappa*v.rho*v.theta/v.sigma*v.dt
@@ -36,7 +36,7 @@ type MonteCarloHeston(simconfig:SimulationCube,instr:Instrument,md:Marketdata)=
            {K0=K0;K1=K1;K2=K2;K3=K3;K4=K4;A=A}
 
     
-    override self.generatepath()=
+    override self.generatepath(md:Marketdata)=
         let simdata = self.simconfig
         let (assets,simcube)=MonteCarloCube.generate_cube simdata (int(simdata.seed))
         let (_,simcube_vol) = MonteCarloCube.generate_cube simdata (int(simdata.seed2))

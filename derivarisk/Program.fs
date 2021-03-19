@@ -93,11 +93,12 @@ let main argv =
     md.spots.[0].points.[1].x <- 1.0
     md.spots.[0].points.[1].y <- 100.0
     md.spots.[0].timeunits <- TimeUnits.years
-    let pricer= MonteCarloHeston(simconfig,voption,md) :> IModel
-    let npv = pricer.compute([|ComputationSelection.NPV|]) voption md
-
+    let pricer= MonteCarloHeston(simconfig,voption) :> IModel
+    let delta_mc = pricer.greekDelta voption md
+    let gamma_mc = pricer.greekGamma voption md
     let analytical = HestonAnalytical() :> IModel
-    let npv2 = analytical.compute([|ComputationSelection.NPV|]) voption md
+    let delta_analytical = analytical.greekDelta voption md
+    let gamma_analytical = analytical.greekGamma voption md
     0 // return an integer exit code
     (*
     HestonParams.dividends=0.02;

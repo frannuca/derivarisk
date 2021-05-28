@@ -21,7 +21,16 @@
 </xs:complexContent>
 </xs:complexType>
 
-
+<xs:complexType name="VolatilitySurface">
+    <xs:complexContent>
+    <xs:extension base="commons:Identifier">
+    <xs:sequence>        
+         <xs:element name="Maturity" type="xs:double"/>
+         <xs:element name="strike2vol" type="commons:Point" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+      </xs:extension>
+</xs:complexContent>
+</xs:complexType>
 
 <xs:complexType name="HestonVolatility">
      <xs:complexContent>
@@ -40,12 +49,24 @@
 </xs:complexContent>
 </xs:complexType>
 
+<xs:element name="MarketDataObject">
+<xs:simpleType>
+    <xs:restriction base="xs:string">
+        <xs:enumeration value="DIVIDEND"/>
+        <xs:enumeration value="VOLATILITY"/>
+        <xs:enumeration value="SPOT"/>
+        <xs:enumeration value="STOCHASTICVOLATILITY"/>
+        <xs:enumeration value="RATE"/>
+    </xs:restriction>
+</xs:simpleType>
+</xs:element>
+
 <xs:element name="Marketdata">
 <xs:complexType>
     <xs:sequence>   
       <xs:element name="referenceDate" type="xs:date"/>
       <xs:element name="dividends" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>
-      <xs:element name="volalities" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
+      <xs:element name="volalities" minOccurs="0" maxOccurs="unbounded"  type="VolatilitySurface"/>      
       <xs:element name="spots" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
       <xs:element name="rates" minOccurs="0" maxOccurs="unbounded"  type="MDseries"/>      
       <xs:element name="stochasticVolatilities" minOccurs="0" maxOccurs="unbounded"  type="HestonVolatility"/>      

@@ -6,9 +6,5 @@
 
   <ItemGroup>
     <None Remove="schema\instrument_commons.xsd" />
-    <None Remove="schema\simulation.xsd" />
-    <None Remove="schema\portfolio.xsd" />
-    <None Remove="schema\commons.xsd" />
-    <None Remove="schema\marketdata.xsd" />
   </ItemGroup>
 </Project>

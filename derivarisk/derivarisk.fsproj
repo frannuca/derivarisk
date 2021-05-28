@@ -4,18 +4,13 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="utils.fs" />
     <Compile Include="commons.fs" />
+    <Compile Include="utils.fs" />
     <Compile Include="dataextractor.fs" />
-    <Compile Include="model.fs" />
-    <Compile Include="BlackScholesModel.fs" />
-    <Compile Include="heston.fs" />
     <Compile Include="simcube.fs" />
-    <Compile Include="mcmodel.fs" />
-    <Compile Include="montecarlo_heston.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
-  <ItemGroup>
+    <PackageReference Include="Deedle.Math" Version="2.3.0">
+      <GeneratePathProperty></GeneratePathProperty>
+    </PackageReference>
     <PackageReference Include="FSharp.Core" Version="5.0.1">
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
@@ -31,11 +26,13 @@
     <PackageReference Include="Deedle" Version="2.3.0">
       <GeneratePathProperty></GeneratePathProperty>
     </PackageReference>
-    <PackageReference Include="Deedle.Math" Version="2.3.0">
-      <GeneratePathProperty></GeneratePathProperty>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\instrumentdata\instrumentdata.csproj" />
+    <Compile Include="model.fs" />
+    <Compile Include="BlackScholesModel.fs" />
+    <Compile Include="heston.fs" />
+    <Compile Include="mcmodel.fs" />
+    <Compile Include="montecarlo_heston.fs" />
+    <Compile Include="gbmmc.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

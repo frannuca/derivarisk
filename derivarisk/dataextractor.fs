@@ -6,6 +6,7 @@ open System.Numerics
 open MathNet.Numerics.Integration
 open MathNet.Numerics.Interpolation
 open MathNet.Numerics.LinearAlgebra
+open DerivaRisk.Commons
 
 module Extractors=
     type RateIntegrationResults={r_minus_q:float;r:float;q:float}
@@ -33,8 +34,34 @@ module Extractors=
         |_ -> failwith "No spot data could be retrieved from the provided market data object"                           
 
 
-    let extract_volatility(md:Marketdata)(id:Identifier):Series<float,float>=
-        extractor md.volalities id
+    let extract_volatility_surface(md:Marketdata)(id:string)=
+         let volsurf = match md.volalities
+                            |> Array.filter(fun s -> s.id=id)
+                            |> List.ofArray with
+                       |[] -> failwith (sprintf "the provided id={%s}" (id))
+                       |l -> l
+                       
+
+         let spline (smile:Point array) =
+            let x = smile |> Array.map(fun p-> p.x)
+            let y = smile |> Array.map(fun p-> p.y)
+            CubicSpline.InterpolateAkima(x, y);
+
+         let T2smile = volsurf |> List.map(fun v -> v.Maturity,spline v.strike2vol)
+                               |> List.sortBy(fun p -> p |> fst)
+                               |> Series.ofObservations
+         let index = T2smile.Index.KeySequence |> Array.ofSeq
+         let volpoint (T:double)(K:double)=
+            let t1,t2 = Commons.binSearch T index
+            let T1,T2 = index.[t1],index.[t2]
+            let v1 = T2smile.Get(T,Lookup.ExactOrSmaller).Interpolate(K)
+            let v2 = T2smile.Get(T,Lookup.ExactOrGreater).Interpolate(K)
+            if t1=t2 then
+                v1
+            else
+                v1 + (v2-v1)*(T2-T)/(T2-T1)
+
+         volpoint
 
     let extract_dividends(md:Marketdata)(id:Identifier):Series<float,float>=
         extractor md.dividends id
@@ -46,7 +73,7 @@ module Extractors=
         let xdata=
             md.stochasticVolatilities
                 |> Array.filter(fun x-> x.id = id.id)
-                |>Array.toList
+                |> Array.toList
                
         match xdata with
         |[h] -> h
@@ -97,4 +124,4 @@ module Extractors=
         names,
         match m.isRowMajor with
         |true -> Matrix<double>.Build.DenseOfRowMajor(names.Length,names.Length,v)
-        | _   ->  Matrix<double>.Build.DenseOfColumnMajor(names.Length,names.Length,v)
+        | _   -> Matrix<double>.Build.DenseOfColumnMajor(names.Length,names.Length,v)

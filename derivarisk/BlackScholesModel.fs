@@ -6,7 +6,7 @@ open InstrumentData
 open Deedle
 
 type BlackScholesModel()=
-    let N x = Normal.CDF(0.0,1.0,x)
+    let N  x = Normal.CDF(0.0,1.0,x)
     let fN x = Normal.PDF(0.0,1.0,x)
 
     let validate_data(vanillaoption:OptionBase)=
@@ -33,11 +33,12 @@ type BlackScholesModel()=
             
             let t = float(vanillaoption.startdate.Subtract(md.referenceDate).Hours)/24.0/360.0
             let T = float(vanillaoption.expiry.Subtract(md.referenceDate).Hours)/24.0/360.0
-            let K=vanillaoption.strike.amount
+            let K = vanillaoption.strike.amount
 
-            let So=Ss.Get(t,Deedle.Lookup.ExactOrSmaller)
+            let So = Ss.Get(t,Deedle.Lookup.ExactOrSmaller)
             let sigma_series = Extractors.extract_volatility md underlyingid
             let sigma = sigma_series.Get(t,Deedle.Lookup.ExactOrSmaller)
+
             let d1 S K T sigma r =
                 (log(S/K)+(r+sigma**2.0/2.0)*T)/(sigma*sqrt(T))
 

@@ -11,7 +11,7 @@ open Deedle
 let main argv =
     let nsim=20000
     let ntime=50
-    let T=0.25
+    let T=1.0/12.0*5.0/30.0
     let hestonParams = {    HestonParams.dividends=0.02;
                             rate=0.03;
                             kappa=6.2;
@@ -34,7 +34,7 @@ let main argv =
 
     let getpar x=
         [(Heston.AssetName("A"),{hestonParams with S0=x})]|>Map.ofSeq
-    let Smin=90.0
+    let Smin=80.0
     let Smax=120.0
     let nS = 200
     let K=100.0
